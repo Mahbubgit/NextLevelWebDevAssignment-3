@@ -1,5 +1,5 @@
 
-import { Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 import { IBook } from "../interfaces/book.interface";
 
 const bookSchema = new Schema<IBook>({
@@ -23,8 +23,8 @@ const bookSchema = new Schema<IBook>({
     },
     isbn: {
         type: String,
-        required :[true, "ISBN can not be null!"],
-        unique: [true, "{VALUE} is already exist. Please provide another ISBN."],
+        required: [true, "ISBN can not be null!"],
+        unique: [true, "This ISBN is already exist. Please provide another ISBN."],
     },
     description: {
         type: String,
@@ -32,10 +32,15 @@ const bookSchema = new Schema<IBook>({
     copies: {
         type: Number,
         required: [true, "Copies can not be null!"],
-        min: [1, "Copies must be greater than or equal to 1. Invalid Copies: {VALUE}"]
+        min: [1, "Copies must be greater than 0. Invalid Copies: {VALUE}"]
     },
     available: {
         type: Boolean,
         default: true
     }
+}, {
+    versionKey: false,
+    timestamps: true
 })
+
+export const Books = model<IBook>("Books", bookSchema)
