@@ -75,4 +75,17 @@ bookRoutes.get('/:bookId', async (req: Request, res: Response) => {
         message: "Book retrieved successfully",
         data: book
     })
+});
+
+//Update Book
+bookRoutes.patch('/:bookId', async (req: Request, res: Response) => {
+    const bookId = req.params.bookId;
+    const updatedBody = req.body;
+    const book = await Books.findByIdAndUpdate(bookId, updatedBody, { new: true });
+
+    res.status(201).json({
+        success: true,
+        message: "Book updated successfully",
+        data: book
+    })
 })
