@@ -27,7 +27,6 @@ bookRoutes.post('/', async (req: Request, res: Response) => {
             data: book
         })
     } catch (error: any) {
-        console.log(error);
         res.status(400).json({
             success: false,
             message: error.message,
@@ -87,5 +86,17 @@ bookRoutes.patch('/:bookId', async (req: Request, res: Response) => {
         success: true,
         message: "Book updated successfully",
         data: book
+    })
+});
+
+//Delete Book
+bookRoutes.delete('/:bookId', async (req: Request, res: Response) => {
+    const bookId = req.params.bookId;
+    const book = await Books.findOneAndDelete({ _id: bookId });
+    
+    res.status(201).json({
+        success: true,
+        message: "Book deleted successfully",
+        data: {}
     })
 })
