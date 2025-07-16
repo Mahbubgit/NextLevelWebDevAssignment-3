@@ -14,17 +14,12 @@ const CreateBookZodSchema = z.object({
     available: z.boolean()
 });
 
-// To create a book
+// Create Book
 bookRoutes.post('/', async (req: Request, res: Response) => {
 
     try {
         const zodBody = await CreateBookZodSchema.parseAsync(req.body)
         const book = await Books.create(zodBody);
-
-        //....Built in and custom instance methods....
-        // const body = req.body
-        // const book = new Books(body);
-        // await book.save();
 
         res.status(201).json({
             success: true,
@@ -42,27 +37,23 @@ bookRoutes.post('/', async (req: Request, res: Response) => {
 }
 )
 
-//To Get All Books
+//Get All Books
 bookRoutes.get('/', async (req: Request, res: Response) => {
 
     //Filtering data
-
     const booksByFilter = req.query.filter ? req.query.filter : ""
     const sortByField = req.query.sortBy ? req.query.sortBy : ""
     const sortOrder = req.query.sort ? req.query.sort : ""
     const limitValue = req.query.limit ? req.query.limit : ""
 
-    console.log(booksByFilter, "sortBy", sortByField, sortOrder, "limit", parseInt(limitValue.toString()));
-
     let books = []
-
 
     if (booksByFilter && sortOrder == "asc") {
         books = await Books.find({ genre: booksByFilter }).sort({ createdAt: 1 }).limit(parseInt(limitValue.toString()));
     } else if (booksByFilter && sortOrder == "desc") {
         books = await Books.find({ genre: booksByFilter }).sort({ createdAt: -1 }).limit(parseInt(limitValue.toString()));
     } else {
-        books = await Books.find({ genre: "asc" }).sort({ createdAt: "asc" }).limit(10);
+        books = await Books.find().sort({ createdAt: "asc" }).limit(10);
     }
 
     res.status(201).json({
@@ -71,3 +62,17 @@ bookRoutes.get('/', async (req: Request, res: Response) => {
         data: books
     })
 });
+
+
+// Get Book by ID
+bookRoutes.get('/:bookId', async (req: Request, res: Response) => {
+    const bookId = req.params.bookId;
+
+    const book = await Books.findById(bookId);
+
+    res.status(201).json({
+        success: true,
+        message: "Book retrieved successfully",
+        data: book
+    })
+})
