@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import z, { int32 } from "zod";
+import z from "zod";
 import { Books } from "../models/book.model";
 
 export const bookRoutes = express.Router();
@@ -28,8 +28,8 @@ bookRoutes.post('/', async (req: Request, res: Response) => {
         })
     } catch (error: any) {
         res.status(400).json({
+            message: error._message,
             success: false,
-            message: error.message,
             error
         })
     }
@@ -93,7 +93,7 @@ bookRoutes.patch('/:bookId', async (req: Request, res: Response) => {
 bookRoutes.delete('/:bookId', async (req: Request, res: Response) => {
     const bookId = req.params.bookId;
     const book = await Books.findOneAndDelete({ _id: bookId });
-    
+
     res.status(201).json({
         success: true,
         message: "Book deleted successfully",
