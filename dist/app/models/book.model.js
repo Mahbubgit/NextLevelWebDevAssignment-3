@@ -1,8 +1,8 @@
-import { model, Schema } from "mongoose";
-import { IBook } from "../interfaces/book.interface";
-import { Borrows } from "./borrow.model";
-
-const bookSchema = new Schema<IBook>({
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Books = void 0;
+const mongoose_1 = require("mongoose");
+const bookSchema = new mongoose_1.Schema({
     title: {
         type: String,
         required: [true, "The book's title can not be null!"],
@@ -25,7 +25,6 @@ const bookSchema = new Schema<IBook>({
         type: String,
         required: [true, "ISBN can not be null!"],
         unique: [true, "This ISBN is already exist. Please provide another ISBN."],
-        trim: true
     },
     description: {
         type: String,
@@ -33,7 +32,7 @@ const bookSchema = new Schema<IBook>({
     copies: {
         type: Number,
         required: [true, "Copies can not be null!"],
-        min: [1, "Copies must be a positive number"],
+        min: [0, "Copies must be a positive number"]
     },
     available: {
         type: Boolean,
@@ -42,15 +41,5 @@ const bookSchema = new Schema<IBook>({
 }, {
     versionKey: false,
     timestamps: true
-})
-
-// Post Hook
-// Delete book from book schema and delete all borrow information of that book created
-bookSchema.post("findOneAndDelete", async function (doc, next) {
-    if (doc) {
-        await Borrows.deleteMany({ book: doc._id })
-    }
-    next()
 });
-
-export const Books = model<IBook>("Books", bookSchema)
+exports.Books = (0, mongoose_1.model)("Books", bookSchema);

@@ -10,21 +10,27 @@ borrowRoutes.post('/', async (req: Request, res: Response) => {
 
     try {
         const body = req.body;
+
         const borrowedBookId: any = await Books.findById({ _id: body.book })
 
         // Validation whether quantity and due date are inputted
-        if (!body.quantity || !body.dueDate) {
+        if (borrowedBookId == null) {
             return res.status(400).json({
                 success: false,
-                message: 'Positive quantity and due date must be inputted!'
+                message: 'Invalid Book ID! Please provide valid book ID.'
             });
-        } else if (!(borrowedBookId?.copies > 0)) //Verify the book has enough available copies
-        {
-            return res.status(400).json({
-                success: false,
-                message: 'Book copies are not available for borrow!'
-            });
-        }
+        } else
+            if (!body.quantity || !body.dueDate) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Positive quantity and due date must be inputted!'
+                });
+            } else if (!(borrowedBookId?.copies > 0)) { //Verify the book has enough available copies
+                return res.status(400).json({
+                    success: false,
+                    message: 'Book copies are not available for borrow!'
+                });
+            }
 
         //*****Custom Static Method**************************
 
@@ -62,7 +68,6 @@ borrowRoutes.get('/', async (req: Request, res: Response) => {
         let borrowedBooks = [];
 
         borrowedBooks = await Borrows.aggregate([
-
             {
                 $facet: {
                     //pipeline-1
@@ -82,7 +87,7 @@ borrowRoutes.get('/', async (req: Request, res: Response) => {
                             }
                         },
                     ],
-                }
+                },
             },
             {
                 $lookup: {
@@ -92,52 +97,57 @@ borrowRoutes.get('/', async (req: Request, res: Response) => {
                     as: "book"
                 }
             },
-
             {
-                $unwind: "$book",
+                $unwind: "$book"
             },
             {
                 $unwind: "$totalQuantity",
             },
             // {
-            //     $match: {
-            //         "totalQuantity._id": { $ne: ["book._id"] }, 
-            //     }
+            //     $limit: 3
             // },
+            {
+                $match: {
+                    // "book._id": new mongoose.Types.ObjectId("688d036abaeb56e89c63f170"),
+                    // "book._id" : "totalQuantity._id"
+                    // "totalQuantity._id": new mongoose.Types.ObjectId("book._id"),
+                }
+            },
 
-            // {
-            //     $match: {
-            //         "book._id": new mongoose.Types.ObjectId("6884d9762626d2659ed3feee"),
-            //6884d9762626d2659ed3feee, 6884d99d2626d2659ed3fef0, 6884d9c72626d2659ed3fef2
-            //         // "totalQuantity.totalQuantity": 5,
-            //         // "book.title": "The Theory of Everything",
-            //         // "book._id" : "totalQuantity._id"
-            //     }
-            // },
             {
                 $project: {
                     _id: 0,
-                    // "book._id": 1,
+                    "book._id": 1,
                     "book.title": 1,
                     "book.isbn": 1,
-                    // "book.copies": 1,
-                    // "totalQuantity._id": 1,
-                    // "totalQuantity.totalQuantity": 1,
-                    "totalQuantity": "$totalQuantity.totalQuantity",
+                    "totalQuantity._id": 1,
+                    "totalQuantity.totalQuantity": 1,
+                    // "totalQuantity": "$totalQuantity.totalQuantity",
                 },
             },
         ]);
 
-        res.status(201).json({
-            success: true,
-            message: "Borrowed books summary retrieved successfully",
-            data: borrowedBooks
-        });
+        // console.log(borrowedBooks.length, "length");
+        // console.log(borrowedBooks, "book ids");
+        if (borrowedBooks.length > 0) {
+            res.status(201).json({
+                success: true,
+                message: "Borrowed books summary retrieved successfully",
+                data: borrowedBooks
+            });
+        } else {
+            res.status(201).json({
+                success: false,
+                message: "No books are borrowed yet.",
+                data: null
+            });
+        }
 
     } catch (error) {
         res.status(400).json({
             success: false,
             message: "Failed to retrieve borrowed books summary.",
+            error
         });
     }
 })
