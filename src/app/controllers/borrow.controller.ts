@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { Borrows } from "../models/borrow.model";
 import { Books } from "../models/book.model";
+import mongoose from "mongoose";
 
 export const borrowRoutes = express.Router();
 
@@ -91,7 +92,6 @@ borrowRoutes.get('/', async (req: Request, res: Response) => {
             { $unwind: "$totalQuantity" },
             {
                 $match: {
-                    // "book._id": { $ne: [("book._id")] },
                     // "totalQuantity._id": "book._id",
                     // "book._id": "totalQuantity._id",
                 }
