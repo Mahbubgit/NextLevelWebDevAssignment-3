@@ -1,13 +1,20 @@
-import { model, Schema } from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
 import { BorrowStaticMethods, IBorrow } from "../interfaces/borrow.interface";
 import { Books } from "./book.model";
 
 const borrowSchema = new Schema<IBorrow, BorrowStaticMethods>({
     book: {
-        type: "ObjectId",
-        required: [true, "The book's ID must be entered!"],
-        trim: true
-    },
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'IBook',
+            required: [true, "The book's ID must be entered!"],
+            trim: true,
+        },
+    // book: {
+    //     type: "ObjectId",
+    //     required: [true, "The book's ID must be entered!"],
+    //     trim: true
+    // },
+
     quantity: {
         type: Number,
         required: [true, "Quantity can not be null!"],

@@ -1,7 +1,6 @@
 import express, { Request, Response } from "express";
 import { Borrows } from "../models/borrow.model";
 import { Books } from "../models/book.model";
-import mongoose from "mongoose";
 
 export const borrowRoutes = express.Router();
 
@@ -62,7 +61,6 @@ borrowRoutes.post('/', async (req: Request, res: Response) => {
 });
 
 // Borrowed Books Summary (Using Aggregation)
-
 borrowRoutes.get('/', async (req: Request, res: Response) => {
     try {
         let borrowedBooks = [];
@@ -71,14 +69,6 @@ borrowRoutes.get('/', async (req: Request, res: Response) => {
             {
                 $facet: {
                     //pipeline-1
-                    "book": [
-                        {
-                            $group: {
-                                _id: "$book",
-                            }
-                        },
-                    ],
-                    //pipeline-2
                     "totalQuantity": [
                         {
                             $group: {
@@ -87,7 +77,7 @@ borrowRoutes.get('/', async (req: Request, res: Response) => {
                             }
                         },
                     ],
-                },
+                }
             },
             {
                 $lookup: {
@@ -97,38 +87,27 @@ borrowRoutes.get('/', async (req: Request, res: Response) => {
                     as: "book"
                 }
             },
-            {
-                $unwind: "$book"
-            },
-            {
-                $unwind: "$totalQuantity",
-            },
-            // {
-            //     $limit: 3
-            // },
+            { $unwind: "$book" },
+            { $unwind: "$totalQuantity" },
             {
                 $match: {
-                    // "book._id": new mongoose.Types.ObjectId("688d036abaeb56e89c63f170"),
-                    // "book._id" : "totalQuantity._id"
-                    // "totalQuantity._id": new mongoose.Types.ObjectId("book._id"),
+                    // "book._id": { $ne: [("book._id")] },
+                    // "totalQuantity._id": "book._id",
+                    // "book._id": "totalQuantity._id",
                 }
             },
-
             {
                 $project: {
                     _id: 0,
-                    "book._id": 1,
+                    // "book._id": 1,
                     "book.title": 1,
                     "book.isbn": 1,
-                    "totalQuantity._id": 1,
-                    "totalQuantity.totalQuantity": 1,
-                    // "totalQuantity": "$totalQuantity.totalQuantity",
+                    // "totalQuantity._id": 1,
+                    // "totalQuantity.totalQuantity": 1,
+                    "totalQuantity": "$totalQuantity.totalQuantity",
                 },
             },
         ]);
-
-        // console.log(borrowedBooks.length, "length");
-        // console.log(borrowedBooks, "book ids");
         if (borrowedBooks.length > 0) {
             res.status(201).json({
                 success: true,
