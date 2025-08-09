@@ -3,7 +3,10 @@
 ***********************************************************************************************
 1. GitHub Repository Link: https://github.com/Mahbubgit/NextLevelWebDevAssignment-3
 2. Live Deployment Link: next-level-web-dev-assignment-3-beryl.vercel.app
-3. Video Explanation: 
+3. Video Explanation Link: 
+
+    a)https://drive.google.com/file/d/1q5NFa9udGS9ki55DXNK7mYvVtk9IyxuA/view?usp=drive_link
+    b)https://drive.google.com/file/d/127hWS78lLglH6k29gFlB8zh7EI4Vpg_n/view?usp=drive_link
 ***********************************************************************************************
 # Features of this application and procedures to setup the project locally.
 

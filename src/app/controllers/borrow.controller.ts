@@ -19,18 +19,17 @@ borrowRoutes.post('/', async (req: Request, res: Response) => {
                 success: false,
                 message: 'Invalid Book ID! Please provide valid book ID.'
             });
-        } else
-            if (!body.quantity || !body.dueDate) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Positive quantity and due date must be inputted!'
-                });
-            } else if (!(borrowedBookId?.copies > 0)) { //Verify the book has enough available copies
-                return res.status(400).json({
-                    success: false,
-                    message: 'Book copies are not available for borrow!'
-                });
-            }
+        } else if (!body.quantity || !body.dueDate) {
+            return res.status(400).json({
+                success: false,
+                message: 'Positive quantity and due date must be inputted!'
+            });
+        } else if (!(borrowedBookId?.copies > 0)) { //Verify the book has enough available copies
+            return res.status(400).json({
+                success: false,
+                message: 'Book copies are not available for borrow!'
+            });
+        }
 
         //*****Custom Static Method**************************
 
